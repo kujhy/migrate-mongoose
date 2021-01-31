@@ -1,13 +1,14 @@
-const mongoose =  require('mongoose');
+const mongoose = require('mongoose');
 const Promise = require('bluebird');
 
 // Factory function for a mongoose model
 mongoose.Promise = Promise;
 const { Schema } = mongoose;
 
-function initializeDB( collection = 'migrations', dbConnection) {
+function initializeDB(collection = 'migrations', dbConnection) {
 
   const MigrationSchema = new Schema({
+    ext: { type: String, default: 'js' },
     name: String,
     createdAt: Date,
     state: {
@@ -19,7 +20,7 @@ function initializeDB( collection = 'migrations', dbConnection) {
     collection: collection,
     toJSON: {
       virtuals: true,
-      transform: function(doc, ret, options) {
+      transform: function (doc, ret, options) {
         delete ret._id;
         delete ret.id;
         delete ret.__v;
@@ -28,15 +29,15 @@ function initializeDB( collection = 'migrations', dbConnection) {
     }
   });
 
-  MigrationSchema.virtual('filename').get(function() {
-    return `${this.createdAt.getTime()}-${this.name}.js`;
+  MigrationSchema.virtual('filename').get(function () {
+    return `${this.createdAt.getTime()}-${this.name}.${this.ext}`;
   });
 
   dbConnection.on('error', err => {
     console.error(`MongoDB Connection Error: ${err}`);
   });
 
-  return dbConnection.model(collection, MigrationSchema );
+  return dbConnection.model(collection, MigrationSchema);
 }
 
 module.exports = initializeDB;
