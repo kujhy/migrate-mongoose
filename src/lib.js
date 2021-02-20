@@ -10,10 +10,6 @@ const mongoose = require('mongoose');
 const MigrationModelFactory = require('./db');
 let MigrationModel;
 
-Promise.config({
-  warnings: false
-});
-
 const defaultMigrationTemplate = `/**
  * Make any changes you need to make to the database here
  */
